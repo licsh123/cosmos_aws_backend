@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTDMapper3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shopping.cosmos.cart.mapper.ChatMapper">
+    <select id="listChat" parameterType="String" resultType="com.shopping.cosmos.cart.domain.ChatVO">
+        select chat_id as chatId,from_email as fromEmail, to_email as toEmail, chat_content as chatContent,
+               chat_time as chatTime
+        from tbl_chat
+        where ((#{fromEmail}=from_email and #{toEmail}=to_email) or (#{fromEmail}=to_email and #{toEmail}=from_email)) and chat_id>#{chatId}
+        order by chat_time
+    </select>
+    <select id="listChatRecent" parameterType="String" resultType="com.shopping.cosmos.cart.domain.ChatVO">
+        select chat_id as chatId,from_email as fromEmail, to_email as toEmail, chat_content as chatContent,
+               chat_time as chatTime
+        from tbl_chat
+        where ((#{fromEmail}=from_email and #{toEmail}=to_email) or (#{fromEmail}=to_email and #{toEmail}=from_email))
+          and chat_id>(select max(chat_id)-#{chatId} from tbl_chat)
+        order by chat_time
+    </select>
+    <insert id="submitChat" parameterType="String">
+        insert into tbl_chat(chat_id,from_email,to_email,chat_content)
+        values(seq_chat.nextval,#{fromEmail},#{toEmail},#{chatContent})
+    </insert>
+
+</mapper>

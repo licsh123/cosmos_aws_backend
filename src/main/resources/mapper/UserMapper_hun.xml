@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTDMapper3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shopping.cosmos.mapper.UserMapper_hun">
+
+
+    <!-- 해당 유저 정보 출력 -->
+    <select id="UserByID" resultType="com.shopping.cosmos.vo.UserVO_hun" parameterType="String">
+        SELECT * FROM tbl_user WHERE user_email = #{user_email}
+    </select>
+
+    <!-- 해당 유저의 배송지 리스트 출력 -->
+    <select id="UserAddressList" resultType="com.shopping.cosmos.vo.UserVO_hun" parameterType="String">
+        select * from tbl_address_info where user_email = #{user_email}
+    </select>
+
+    <!-- 해당 유저의 정보 변경 -->
+    <update id="UpdateUserInfo" parameterType="com.shopping.cosmos.vo.UserVO_hun">
+        update tbl_user
+        <trim prefix="set" suffixOverrides=",">
+            <if test="change_email != null">
+                user_email = #{change_email},
+            </if>
+            <if test="change_phone != null">
+                user_phone = #{change_phone},
+            </if>
+            <if test="change_password != null">
+                user_password = #{change_password},
+            </if>
+        </trim>
+        where user_email = #{user_email}
+    </update>
+
+    <!-- 해당 유저 회원 탈퇴 -->
+    <update id="DeleteUserInfo" parameterType="com.shopping.cosmos.vo.UserVO_hun">
+        <if test="user_email != null">
+            update tbl_user set user_role = 2 where user_email = #{user_email}
+        </if>
+    </update>
+
+    <update id="InsertUserAccount" parameterType="com.shopping.cosmos.vo.UserVO_hun">
+        update tbl_user set user_bank = #{user_bank}, user_account = #{user_account} where user_email = #{user_email}
+    </update>
+
+    <select id="UserAccount" parameterType="com.shopping.cosmos.vo.UserVO_hun" resultType="com.shopping.cosmos.vo.UserVO_hun">
+        select * from tbl_user where user_email = #{user_email}
+    </select>
+
+    <update id="UpdateUserAccount" parameterType="com.shopping.cosmos.vo.UserVO_hun">
+        update tbl_user set user_bank = #{user_bank}, user_account = #{user_account} where user_email = #{user_email}
+    </update>
+
+    <update id="InsertUserRepay" parameterType="com.shopping.cosmos.vo.UserVO_hun">
+        update tbl_user set user_repay = #{user_repay} where user_email = #{user_email}
+    </update>
+
+    <update id="UpdateUserRepay" parameterType="com.shopping.cosmos.vo.UserVO_hun">
+        update tbl_user set user_repay = #{user_repay} where user_email = #{user_email}
+    </update>
+
+    <select id="GetUserAddressBySeq" parameterType="int" resultType="com.shopping.cosmos.vo.UserVO_hun">
+        select * from tbl_address_info where address_seq = #{address_seq}
+    </select>
+
+    <update id="UpdateUserAddress" parameterType="com.shopping.cosmos.vo.UserVO_hun">
+        update tbl_address_info set post_code = #{post_code}, address = #{address}, address_phone = #{address_phone}, address_phone2 = #{address_phone2}, detail_address = #{detail_address}, address_name = #{address_name}, user_name = #{user_name} where address_seq = #{address_seq}
+    </update>
+
+    <delete id="DeleteUserAddress" parameterType="int">
+        delete tbl_address_info where address_seq = #{address_seq}
+    </delete>
+
+    <insert id="InsertUserAddress" parameterType="com.shopping.cosmos.vo.UserVO_hun">
+        insert into tbl_address_info (user_email, address_name, post_code, address, detail_address, address_phone, user_name
+        <if test="address_phone2 != null">
+            , address_phone2
+        </if>
+        ) values(#{user_email}, #{address_name}, #{post_code}, #{address}, #{detail_address}, #{address_phone}, #{user_name}
+        <if test="address_phone2 != null">
+            , #{address_phone2}
+        </if>
+        )
+    </insert>
+</mapper>

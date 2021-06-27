@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTDMapper3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shopping.cosmos.mapper.ProductMapper_hun">
+
+
+
+    <!-- 해당 상품 클릭시 VO하나 출력 -->
+    <select id="ProductByID" resultType="com.shopping.cosmos.vo.ProductVO_hun"
+            parameterType="int">
+        select @rownum := @rownum +1 as rnum, p.*
+        from
+        (select product_id, product_title, product_content, product_price, product_gender, product_category, product_img, group_concat(product_color) product_color, group_concat(product_size) product_size
+        from
+        tbl_product group by product_id, product_title, product_content, product_price, product_gender, product_category, product_img) p , (select @rownum := 0) tmp where product_id = #{product_id}
+    </select>
+
+
+    <!-- Product 리스트 출력 -->
+    <select id="productCategory" parameterType="com.shopping.cosmos.vo.ProductVO_hun" resultType="com.shopping.cosmos.vo.ProductVO_hun">
+        select * from
+        (select @rownum := @rownum +1 rnum, pt.*
+        from
+        (select p.product_id, p.product_title, p.product_content, p.product_price, p.product_gender, p.product_category, p.product_img, group_concat(p.product_color) product_color, group_concat(p.product_size) product_size, po.product_saled
+        from
+        tbl_product p, (select product_id, sum(product_saled) product_saled from tbl_product_option group by product_id) po where p.product_id = po.product_id
+        group by product_id, product_title, product_content, product_price, product_gender, product_category, product_img, product_saled) pt, (select @rownum := 0) tmp
+        <where>
+            <if test="search_keyword != null">
+                and (product_title like concat('%',#{search_keyword},'%') or product_content like concat('%',#{search_keyword},'%') or product_category like concat('%',#{search_keyword},'%') or product_gender like concat('%',#{search_keyword},'%') or product_color like concat('%',#{search_keyword},'%') or product_size like concat('%',#{search_keyword},'%'))
+            </if>
+            <if test="product_gender != null and product_gender != 'null'">
+                and product_gender = #{product_gender}
+            </if>
+            <if test="product_category != null">
+                and product_category = #{product_category}
+            </if>
+            <if test="product_category == null">
+                and product_category != '악세사리'
+            </if>
+            <if test="select_color != null">
+                and product_color like concat('%',#{select_color},'%')
+            </if>
+            <if test="select_size != null">
+                and product_size like concat('%',#{select_size},'%')
+            </if>
+        </where>
+        ) pa
+        <where>
+            rnum between ((#{product_pageNum}-1)*12)+1 and (#{product_pageNum}*12)
+            <if test="select_option != null and select_option == 'product_saled'">
+                order by product_saled desc
+                <!--order by #{select_option} desc-->
+            </if>
+            <if test="select_option != null and select_option == 'product_id'">
+                order by product_id desc
+                <!--order by #{select_option} desc-->
+            </if>
+            <if test="select_option != null and select_option == 'product_low_price'">
+                order by product_price
+                <!--order by #{select_option} desc-->
+            </if>
+            <if test="select_option != null and select_option == 'product_high_price'">
+                order by product_price desc
+                <!--order by #{select_option} desc-->
+            </if>
+        </where>
+    </select>
+
+
+
+    <!-- 페이지 번호 출력 -->
+    <select id="findPageNum" parameterType="com.shopping.cosmos.vo.ProductVO_hun" resultType="int">
+        select
+        max(@rownum := @rownum +1) as rnum
+        from
+        (select product_id, product_title, product_content, product_price, product_gender, product_category, product_img, group_concat(product_color) product_color, group_concat(product_size) product_size
+        from tbl_product
+        group by product_id, product_title, product_content, product_price, product_gender, product_category, product_img) p, (select @rownum := 0) tmp
+        <where>
+            <if test="search_keyword != null">
+                and (product_title like concat('%',#{search_keyword},'%') or product_content like concat('%',#{search_keyword},'%') or product_category like concat('%',#{search_keyword},'%') or product_gender like concat('%',#{search_keyword},'%') or product_color like concat('%',#{search_keyword},'%') or product_size like concat('%',#{search_keyword},'%'))
+            </if>
+            <if test="product_gender != null and product_gender != 'null'">
+                and product_gender = #{product_gender}
+            </if>
+            <if test="product_category != null">
+                and product_category = #{product_category}
+            </if>
+            <if test="product_category == null">
+                and product_category != '악세사리'
+            </if>
+            <if test="select_color != null">
+                and product_color like concat('%',#{select_color},'%')
+            </if>
+            <if test="select_size != null">
+                and product_size like concat('%',#{select_size},'%')
+            </if>
+        </where>
+    </select>
+
+
+</mapper>

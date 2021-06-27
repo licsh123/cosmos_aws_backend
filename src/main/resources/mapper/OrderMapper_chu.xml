@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTDMapper3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shopping.cosmos.cart.mapper.OrderMapper">
+    <insert id="insertOrder" parameterType="com.shopping.cosmos.cart.domain.OrderVO">
+        insert into tbl_order(order_id,user_email,user_name,post_code,address,detail_address,order_product_amount,total_price)
+        values(#{orderId},#{userId},#{userName},#{postCode},#{address},#{detailAddress},#{orderProductAmount},#{totalPrice})
+    </insert>
+    <insert id="insertOrderDetail" parameterType="com.shopping.cosmos.cart.domain.OrderDetailVO">
+        insert into tbl_order_detail(order_id,product_seq,money,amount)
+        values(#{orderId},#{productId},#{money},#{amount})
+    </insert>
+</mapper>

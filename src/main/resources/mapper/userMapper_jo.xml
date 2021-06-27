@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybaatis.org//DTDMapper3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- com.springboot.cos.signup.mapper.UserMapper안에 메소드가 실행봐되면 여기를 거침 -->
+<mapper namespace="com.shopping.cosmos.user.mapper.UserMapper_jo">
+
+    <insert id="insertUser" parameterType="com.shopping.cosmos.user.vo.UserVO_jo">
+        <!-- 사용자가 입력한 값들을 유저테이블과 주소테이블 둘다 넣어줌 -->
+        INSERT INTO tbl_user(user_email,user_password,user_name,user_birthday,user_phone,user_role,user_gender)
+        VALUES(#{user_email},#{user_password},#{user_name},#{user_birthday},#{user_phone},0,#{user_gender})
+    </insert>
+    <insert id="insertUserAddress" parameterType="com.shopping.cosmos.user.vo.UserVO_jo">
+        <!-- 사용자가 입력한 값들을 유저테이블과 주소테이블 둘다 넣어줌 -->
+        INSERT
+        INTO tbl_address_info(user_email,post_code,address,detail_address,user_name)
+        VALUES(#{user_email},#{post_code},#{address},#{detail_address},#{user_name})
+    </insert>
+
+    <select id="userEmailCheck" resultType="int">
+        <!-- 중복확인 이메일이 있으면 1의 값을주고 없으면 0의 값을 줌  -->
+        select count(*) from tbl_user where user_email=#{user_email}
+    </select>
+
+    <select id="getUserList" parameterType="com.shopping.cosmos.user.vo.UserVO_jo"
+            resultType="com.shopping.cosmos.user.vo.UserVO_jo">
+        SELECT cu.user_email, cu.user_name,cu.user_phone,cd.address,cd.detail_address,cu.user_regdate
+        FROM tbl_user cu,tbl_address_info cd
+        where cu.user_email=cd.user_email
+        limit #{startRow}, #{endRow};
+    </select>
+
+    <select id="userCount" resultType="int">
+        SELECT count(*)
+        FROM tbl_user
+    </select>
+
+    <select id="userSearch" parameterType="com.shopping.cosmos.user.vo.UserSearchVO_jo"
+            resultType="com.shopping.cosmos.user.vo.UserSearchVO_jo">
+        SELECT cu.user_email, cu.user_name,cu.user_phone,cd.address,cd.detail_address,cu.user_regdate
+        from tbl_user cu,tbl_address_info cd
+        where cu.user_email = cd.user_email and
+        <if test="searchType=='user_email'">cu.user_email like concat('%', #{keyword}, '%')</if>
+        <if test="searchType=='user_name'">cu.user_name like concat('%', #{keyword} ,'%')</if>
+        <if test="searchType=='user_phone'">cu.user_phone like concat('%', #{keyword} ,'%')</if>
+        order by cu.user_email desc
+    </select>
+
+    <select id="userState" parameterType="com.shopping.cosmos.user.vo.UserStateVO_jo"
+            resultType="com.shopping.cosmos.user.vo.UserStateVO_jo">
+        SELECT user_crud,user_email, user_name,user_gender,user_birthday,user_phone,user_regdate
+        FROM tbl_user_log
+        limit #{startRow},#{endRow}
+    </select>
+
+    <select id="userStateSearch" parameterType="com.shopping.cosmos.user.vo.UserStateVO_jo"
+            resultType="com.shopping.cosmos.user.vo.UserStateVO_jo">
+        SELECT *
+        from tbl_user_log
+        where
+        <if test="searchType=='user_email'">user_email like '%' || #{keyword} || '%'</if>
+        <if test="searchType=='user_name'">user_name like '%' || #{keyword} || '%'</if>
+        <if test="searchType=='user_phone'">user_phone like '%' || #{keyword} || '%'</if>
+        order by user_email desc
+    </select>
+
+    <select id="userLogCount" resultType="int">
+        SELECT count(*)
+        FROM tbl_user_log
+    </select>
+</mapper>

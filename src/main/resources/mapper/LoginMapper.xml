@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTDMapper3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shopping.cosmos.login.mapper.UserMapper_DI">
+
+    <select id="getUserCntByPass" parameterType="com.shopping.cosmos.login.vo.UserVO_DI" resultType="int">
+        SELECT COUNT(*) FROM tbl_user
+        WHERE user_email=#{user_email} AND user_password=#{user_password} AND user_role=#{user_role}
+    </select>
+
+    <select id="getUser" parameterType="com.shopping.cosmos.login.vo.UserVO_DI" resultType="com.shopping.cosmos.login.vo.UserVO_DI">
+        SELECT * FROM tbl_user
+        WHERE user_email=#{user_email} AND user_password=#{user_password} AND user_role=#{user_role}
+    </select>
+
+    <select id="getEmailCnt" parameterType="com.shopping.cosmos.login.vo.UserVO_DI" resultType="int">
+        SELECT COUNT(*) FROM tbl_user
+        WHERE user_name=#{user_name} AND user_birthday=#{user_birthday} and user_role =0
+    </select>
+
+    <select id="getEmail" parameterType="com.shopping.cosmos.login.vo.UserVO_DI" resultType="com.shopping.cosmos.login.vo.UserVO_DI">
+        SELECT * FROM tbl_user
+        WHERE user_name=#{user_name} AND user_birthday=#{user_birthday} and user_role =0
+    </select>
+
+    <select id="getPWCnt" parameterType="com.shopping.cosmos.login.vo.UserVO_DI" resultType="int">
+        SELECT COUNT(*) FROM tbl_user
+        WHERE user_email=#{user_email} AND user_name=#{user_name} AND user_birthday=#{user_birthday} and user_role =0
+    </select>
+
+    <select id="getPW" parameterType="com.shopping.cosmos.login.vo.UserVO_DI" resultType="com.shopping.cosmos.login.vo.UserVO_DI">
+        SELECT * FROM tbl_user
+        WHERE user_email=#{user_email} AND user_name=#{user_name} AND user_birthday=#{user_birthday} and user_role =0
+    </select>
+
+</mapper>

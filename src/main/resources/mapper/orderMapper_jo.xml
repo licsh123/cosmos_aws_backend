@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybaatis.org//DTDMapper3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- com.springboot.cos.signup.mapper.UserMapper안에 메소드가 실행봐되면 여기를 거침 -->
+<mapper namespace="com.shopping.cosmos.order.mapper.OrderMapper_jo">
+
+
+    <select id="orderStatus" resultType="com.shopping.cosmos.order.vo.OrderDetailVO_jo">
+        select tord.order_detail_num,tord.order_id,tp.product_seq,tor.user_email,tp.product_id,tp.product_title,tp.product_size,
+        tp.product_color,tord.amount, tor.order_date
+        from tbl_order tor , tbl_order_detail tord, tbl_product tp
+        where tor.order_id= tord.order_id and tp.product_seq=tord.product_seq and (tor.order_status like '배송준비중' or
+        tor.order_status like '배송중')
+        limit #{startRow} , #{endRow}
+    </select>
+
+    <select id="orderCount" resultType="int">
+        select count(*)
+        from tbl_order tor, tbl_order_detail tord
+        where tor.order_id= tord.order_id and (tor.order_status='배송준비중' or tor.order_status='배송중')
+    </select>
+
+    <select id="orderDetail" resultType="com.shopping.cosmos.order.vo.OrderDetailVO_jo">
+        select
+        tor.order_id,tord.order_detail_num,tp.product_img,tp.product_seq,tp.product_title,tord.money,tu.user_email,tu.user_name,
+        tai.address, tai.detail_address, tor.order_status
+        from tbl_order_detail tord, tbl_order tor, tbl_product tp,tbl_address_info tai, tbl_user tu
+        where tord.order_id=tor.order_id and tord.product_seq=tp.product_seq and tai.user_email=tu.user_email
+        and tord.order_detail_num=#{order_detail_num} and tu.user_email=#{user_email}
+    </select>
+    <!--
+        <update id="stateChange">
+            UPDATE tbl_order
+            SET order_status=#{order_status}
+            where product_seq=#{product_seq} and order_id=#{order_id}
+        </update>
+        -->
+    <update id="stateChange">
+        UPDATE tbl_order
+        SET order_status=#{order_status}
+        where order_id=#{order_id}
+    </update>
+
+    <select id="cancleOrder" resultType="com.shopping.cosmos.order.vo.OrderDetailVO_jo">
+        select tord.order_detail_num,tord.order_id,tp.product_id,tp.product_seq,tor.user_email,
+        tp.product_title,tp.product_size,tp.product_color,tord.amount, tor.order_date
+        from tbl_order tor , tbl_order_detail tord, tbl_product tp
+        where tor.order_id= tord.order_id and tp.product_seq=tord.product_seq and tor.order_status='취소요청'
+        limit #{startRow} , #{endRow}
+    </select>
+
+    <select id="cancleOrderCount" resultType="int">
+        select count(*)
+        from tbl_order tor, tbl_order_detail tord
+        where tor.order_id= tord.order_id and tor.order_status='취소요청'
+    </select>
+
+    <select id="orderStatusSearch" resultType="com.shopping.cosmos.order.vo.OrderSearchVO_jo">
+        select tord.order_detail_num,tord.order_id,tp.product_seq,tp.product_id,tor.user_email,
+        tp.product_title,tp.product_size,
+        tp.product_color,tord.amount, tor.order_date
+        from tbl_order tor , tbl_order_detail tord, tbl_product tp
+        where
+        <if test="searchType=='product_title'"> tp.product_title like concat('%', #{keyword} , '%')</if>
+        <if test="searchType=='user_email'">tor.user_email like concat('%', #{keyword},'%') </if>
+        and tor.order_id= tord.order_id and tp.product_seq=tord.product_seq
+        and (tor.order_status='배송준비중' or tor.order_status='배송중')
+    </select>
+
+</mapper>

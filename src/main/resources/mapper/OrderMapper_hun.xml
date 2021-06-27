@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTDMapper3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shopping.cosmos.mapper.OrderMapper_hun">
+
+    <!-- 해당 유저의 주문목록 모두 가져오기 -->
+    <select id="getUserOrderList" resultType="com.shopping.cosmos.vo.OrderVO_hun" parameterType="String">
+        select * from tbl_order where user_email = #{user_email} order by order_date desc
+    </select>
+
+    <!-- 해당 주문내역 취소하기 -->
+    <update id="returnOrder" parameterType="String">
+        update tbl_order set order_status = '취소요청' where order_id = #{order_id}
+    </update>
+
+    <!-- 주문 내역 상세 보기 1 -->
+    <select id="selectOrderInfo" parameterType="String" resultType="com.shopping.cosmos.vo.OrderVO_hun">
+        select * from tbl_order where order_id = #{order_id}
+    </select>
+
+    <!-- 주문 내역 상세 보기 2 -->
+    <select id="selectOrderDetailInfo" parameterType="String" resultType="com.shopping.cosmos.vo.OrderDetailVO_hun">
+        select p.*, od.order_id, od.money, od.amount from tbl_order_detail od, tbl_product p where od.order_id = #{order_id} and od.product_seq = p.product_seq
+    </select>
+
+</mapper>

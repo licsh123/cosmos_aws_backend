@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTDMapper3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shopping.cosmos.cart.mapper.CartMapper">
+    <insert id="insertCart" parameterType="com.shopping.cosmos.cart.domain.CartVO">
+        insert into tbl_cart(user_email,product_seq,amount)
+        values(#{userId},#{productId},#{amount})
+    </insert>
+    <select id="listCart" parameterType="String" resultType="com.shopping.cosmos.cart.domain.CartVO">
+        select c.cart_id as cartId, c.user_email as userId, p.product_seq as productId,
+               m.user_name as userName, p.product_title as productName,
+               c.amount as amount , p.product_price as productPrice, (product_price*amount) money,
+               p.product_img as productImagePath,p.product_size as productSize,po.product_stock as productStock, p.product_color as productColor
+        from tbl_user m,tbl_cart c, tbl_product p,tbl_product_option po
+        where m.user_email = c.user_email and p.product_seq = c.product_seq and c.user_email=#{userId} and c.product_seq=po.product_seq
+    </select>
+    <update id="modifyCart" parameterType="com.shopping.cosmos.cart.domain.CartVO">
+        update tbl_cart
+        set amount = #{amount}
+        where user_email=#{userId} and product_seq=#{productId}
+    </update>
+    <select id="countCart" parameterType="com.shopping.cosmos.cart.domain.CartVO" resultType="int">
+        select count(*)
+        from tbl_cart
+        where user_email=#{userId} and product_seq=#{productId}
+    </select>
+    <update id="updateCart" parameterType="com.shopping.cosmos.cart.domain.CartVO">
+        update tbl_cart
+        set amount=amount+#{amount}
+        where user_email = #{userId} and product_seq=#{productId}
+    </update>
+    <delete id="deleteCart" parameterType="int">
+        delete from tbl_cart
+        where cart_id = #{cartId}
+    </delete>
+    <delete id="deleteCartAll">
+        delete from tbl_cart
+        where user_email=#{userId}
+    </delete>
+    <select id="sumMoney" resultType="int">
+        select nvl(sum(product_price*amount),0) money
+        from tbl_cart c, tbl_product p
+        where c.product_seq = p.product_seq and c.user_email = #{userId}
+    </select>
+    <select id="listAddress" parameterType="String" resultType="com.shopping.cosmos.cart.domain.AddressVO">
+        select user_name as userName, user_email as userId, post_code as postCode, address, detail_address as detailAddress
+        from tbl_address_info
+        where user_email=#{userId}
+    </select>
+    <select id="userOrderData" parameterType="String" resultType="com.shopping.cosmos.cart.domain.UserVO">
+        select user_email, user_name, user_phone
+        from tbl_user
+        where user_email=#{userId}
+    </select>
+</mapper>

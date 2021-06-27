@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybaatis.org//DTDMapper3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- com.springboot.cos.signup.mapper.UserMapper안에 메소드가 실행봐되면 여기를 거침 -->
+<mapper namespace="com.shopping.cosmos.product.mapper.ProductMapper_jo">
+
+    <insert id="insertProduct" parameterType="com.shopping.cosmos.product.vo.ProductVO_jo">
+        INSERT
+        INTO tbl_product(product_seq,product_id,product_title,product_gender,product_category,product_price,product_color,product_size,product_content,product_img,product_material)
+        VALUES((select*from(select max(product_seq)+1 from tbl_product) next),(select*from(select max(product_id)+1 from tbl_product) next),#{product_title},#{product_gender},#{product_category},#{product_price},#{product_color},#{product_size},#{product_content},#{product_img},#{product_material})
+    </insert>
+
+    <insert id="insertProductOption" parameterType="com.shopping.cosmos.product.vo.ProductVO_jo">
+        INSERT
+        INTO tbl_product_option(product_seq,PRODUCT_ID,product_stock)
+        VALUES((select*from(select max(product_seq) from tbl_product) next),(select*from(select max(product_id) from tbl_product) next),#{product_stock})
+    </insert>
+
+    <insert id="insertProductId" parameterType="com.shopping.cosmos.product.vo.ProductVO_jo">
+        INSERT
+        INTO tbl_product(product_seq,product_id,product_title,product_gender,product_category,product_price,product_color,product_size,product_content,product_img,product_material)
+        VALUES((select*from(select max(product_seq)+1 from tbl_product) next),(select*from(select max(product_id) from tbl_product) next),
+        #{product_title},#{product_gender},#{product_category},#{product_price},#{product_color},#{product_size},#{product_content},
+        #{product_img},#{product_material})
+    </insert>
+
+    <insert id="insertProductIdOption" parameterType="com.shopping.cosmos.product.vo.ProductVO_jo">
+        INSERT
+        INTO tbl_product_option(product_seq,PRODUCT_ID,product_stock)
+        VALUES((select*from(select max(product_seq) from tbl_product) next),(select*from(select max(product_id) from tbl_product) next),#{product_stock})
+    </insert>
+
+    <insert id="insertProductUpdate" parameterType="com.shopping.cosmos.product.vo.ProductVO_jo">
+        INSERT
+        INTO tbl_product(product_seq, PRODUCT_ID, product_title,product_gender,product_category,product_price,product_color,product_size,product_content,product_img,product_material)
+        VALUES((select*from(select max(product_seq)+1 from tbl_product) next),#{product_id},
+        #{product_title},#{product_gender},#{product_category},#{product_price},#{product_color},#{product_size},#{product_content},#{product_img},#{product_material})
+    </insert>
+
+    <insert id="insertProductOptionUpdate" parameterType="com.shopping.cosmos.product.vo.ProductVO_jo">
+        INSERT
+        INTO tbl_product_option(product_seq,PRODUCT_ID,product_stock)
+        VALUES((select*from(select max(product_seq) from tbl_product) next),#{product_id},#{product_stock})
+    </insert>
+
+    <select id="equalsProduct" resultType="int" parameterType="com.shopping.cosmos.product.vo.ProductVO_jo">
+        select count(*) from tbl_product where product_seq =#{product_seq}
+    </select>
+
+    <select id="productIdList" resultType="com.shopping.cosmos.product.vo.ProductVO_jo"
+            parameterType="com.shopping.cosmos.product.vo.ProductVO_jo">
+        select * from tbl_product where product_id = #{product_id}
+    </select>
+
+    <select id="productCount" resultType="int">
+        select count(product_id) as cnt from (select product_id, count(product_id)
+        from tbl_product group by product_id) as product_cnt
+    </select>
+
+    <select id="getProductList" parameterType="com.shopping.cosmos.product.vo.ProductVO_jo"
+            resultType="com.shopping.cosmos.product.vo.ProductVO_jo">
+        select tp.product_id, tp.product_title, tp.product_price, tp.product_gender, tp.product_category, tp.product_img
+        from tbl_product as tp left join tbl_product_option as tpo on tp.product_seq = tpo.product_seq and tp.product_id = tpo.product_id
+        group by tp.product_id, tp.product_title, tp.product_price, tp.product_gender, tp.product_category, tp.product_img
+        order by tp.product_id desc
+        limit #{startRow}, #{endRow}
+
+    </select>
+
+    <select id="getProductDetail" parameterType="com.shopping.cosmos.product.vo.ProductVO_jo" resultType="com.shopping.cosmos.product.vo.ProductVO_jo">
+        select tp.product_seq,tp.product_id, tp.product_title, tp.product_date, tp.product_content, tp.product_price,
+        tp.product_gender, tp.product_category, tp.product_img,
+        tp.product_color, tp.product_size, tp.product_material, tpo.product_stock, tpo.product_saled
+        from tbl_product tp, tbl_product_option tpo
+        where tp.product_seq = tpo.product_seq and tpo.product_id= #{product_id}
+    </select>
+
+    <select id="seachList" parameterType="com.shopping.cosmos.product.vo.ProductVO_jo" resultType="com.shopping.cosmos.product.vo.ProductVO_jo">
+        select product_id, product_title, product_price, product_gender, product_category, product_img
+        from tbl_product
+        where product_title like concat('%', #{product_title}  , '%')
+        group by product_id, product_title, product_price, product_gender, product_category, product_img
+        order by product_id
+    </select>
+
+    <update id="updateProductOption" parameterType="com.shopping.cosmos.product.vo.ProductVO_jo">
+        UPDATE tbl_product_option
+        SET product_stock=#{product_stock}
+        where product_seq=#{product_seq} and product_id=#{product_id}
+    </update>
+
+    <update id="updateProduct" parameterType="com.shopping.cosmos.product.vo.ProductVO_jo">
+        UPDATE tbl_product
+        SET
+        product_title=#{product_title},product_content=#{product_content},product_price=#{product_price},product_gender=#{product_gender},product_category=#{product_category},
+        product_img=#{product_img},product_size=#{product_size},product_color=#{product_color},product_material=#{product_material}
+        where product_seq=#{product_seq} and product_id=#{product_id}
+    </update>
+
+    <delete id="deleteProduct" parameterType="com.shopping.cosmos.product.vo.ProductVO_jo">
+        delete from tbl_product where product_id=#{product_id}
+    </delete>
+
+    <delete id="deleteProductOption" parameterType="com.shopping.cosmos.product.vo.ProductVO_jo">
+        delete from tbl_product_option where product_id=#{product_id}
+    </delete>
+
+    <delete id="deleteProductSeq" parameterType="com.shopping.cosmos.product.vo.ProductVO_jo">
+        delete from tbl_product where product_seq=#{product_seq}
+    </delete>
+
+    <delete id="deleteProductOptionSeq" parameterType="com.shopping.cosmos.product.vo.ProductVO_jo">
+        delete from tbl_product_option where product_seq=#{product_seq}
+    </delete>
+</mapper>
